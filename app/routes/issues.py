@@ -191,7 +191,7 @@ def create_issue(current_user):
 
 @issues_bp.route('/<string:issue_id>/comments/', methods=['POST'])
 @token_required
-def add_comment_to_issue(issue_id, current_user):
+def add_comment_to_issue(current_user, issue_id):
     """
     Adds a comment to a specific issue.
     Receives JSON with a 'text' field.
@@ -237,7 +237,7 @@ def add_comment_to_issue(issue_id, current_user):
     
 @issues_bp.route('/<string:issue_id>/status/', methods=['PUT'])
 @role_required(UserRole.Admin) 
-def update_issue_status(issue_id, current_user):
+def update_issue_status(current_user, issue_id):
     """
     Updates the status of an issue.
     Accessible by Admins or the assigned Worker.
@@ -312,7 +312,7 @@ def assign_issue_to_worker(issue_id):
 
 @issues_bp.route('/<string:issue_id>/resolve/', methods=['PUT'])
 @role_required(UserRole.Citizen)
-def resolve_issue(issue_id, current_user):
+def resolve_issue(current_user, issue_id):
     """
     Allows the original reporter to confirm an issue's resolution and provide a rating.
     Accessible only by the citizen who reported the issue.
