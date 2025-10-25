@@ -71,6 +71,7 @@ def categorize_issue_with_gemini(description: str, image_parts: list) -> dict:
         }
 
         prompt = f"""
+            As a response to this prompt i only need the json no other text should be sent not even confirmation.
             Analyze this issue report and respond **only** in JSON with fields:
             "category": "<one of: Pothole, Garbage, Streetlight, Graffiti, Flooding, Damaged Signage, Other>",
             "title": "<short title>"
