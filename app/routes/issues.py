@@ -100,6 +100,7 @@ def create_issue(current_user):
     Receives multipart/form-data with description, location (JSON string), and photos.
     """
     try:
+        print(f"Post issues api is triggered")
         # 1. Parse form data
         description = request.form.get('description')
         location_str = request.form.get('location')
@@ -408,7 +409,7 @@ def get_issue_by_id(current_user, id):
         return jsonify({"message": "An error occurred while fetching the issue"}), 500
     
 
-@issues_bp.route('/api/issues/public/recent', methods=['GET'])
+@issues_bp.route('/public/recent', methods=['GET'])
 def get_recent_public_issues():
     """
     Fetches all civic issues that were reported within the last 7 days.
