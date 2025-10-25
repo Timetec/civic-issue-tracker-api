@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Issue Received</title>
+</head>
+<body style="font-family: sans-serif; color: #333;">
+    <div style="max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
+        <h2 style="color: #4F46E5;">Civic Issue Tracker</h2>
+        <p>Hi {{ user.first_name }} {{ user.last_name }},</p>
+        <p>Thank you for your report. We have received your issue and our team will review it shortly.</p>
+        <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+        <p><strong>Issue ID:</strong> #{{ issue.public_id }}</p>
+        <p><strong>Current Status:</strong> {{ issue.status }}</p>
+        <br>
+        <p style="font-size: 12px; color: #999;">You will receive another notification when the status of this issue changes.</p>
+    </div>
+</body>
+</html>
