@@ -134,7 +134,7 @@ def create_issue(current_user):
         assigned_worker = find_nearest_worker(location)
 
         # 5. Create the issue in the database (example using a dictionary)
-        reporter = current_user.user
+        reporter = current_user
         new_issue_data = {
             "id": str(uuid.uuid4())[:8],
             "title": ai_result.get("title", "Issue Report"),
@@ -182,7 +182,7 @@ def add_comment_to_issue(issue_id, current_user):
             return jsonify({"message": "Issue not found."}), 404
         
         # 2. Check if user is authorized to comment (example logic)
-        author = current_user.user
+        author = current_user
         is_reporter = issue.reporterId == author.email
         is_assigned = issue.assignedTo == author.email
         is_admin = author.role == 'Admin'
@@ -229,13 +229,13 @@ def update_issue_status(issue_id, current_user):
         
         # 2. Authorization Check
         # In a real app `g.user` would be the SQLAlchemy object.
-        is_admin = current_user.user['role'] == 'Admin'
-        is_assigned_worker = current_user.user['email'] == issue['assignedTo']
+        is_admin = current_user['role'] == 'Admin'
+        is_assigned_worker = current_user['email'] == issue['assignedTo']
         
         if not (is_admin or is_assigned_worker):
             # Simulate a worker trying to access an unassigned issue
-            if current_user.user['role'] == 'Worker' and not is_assigned_worker:
-                 print(f"Auth failed: Worker {current_user.user['email']} is not assigned to issue for {issue['assignedTo']}")
+            if current_user['role'] == 'Worker' and not is_assigned_worker:
+                 print(f"Auth failed: Worker {current_user['email']} is not assigned to issue for {issue['assignedTo']}")
             return jsonify({"message": "You are not authorized to update this issue's status."}), 403
 
         # 3. Update the status and commit
@@ -303,7 +303,7 @@ def resolve_issue(issue_id, current_user):
             return jsonify({"message": "Issue not found."}), 404
         
         # 2. Authorization Check
-        if current_user.user['role'] != 'Citizen' or current_user.user['email'] != issue['reporterId']:
+        if current_user['role'] != 'Citizen' or current_user['email'] != issue['reporterId']:
             return jsonify({"message": "You are not authorized to resolve this issue."}), 403
 
         # 3. Business Logic Check: Can only resolve if status is 'For Review'
