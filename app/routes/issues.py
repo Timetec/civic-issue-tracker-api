@@ -3,7 +3,7 @@ from werkzeug.utils import secure_filename
 from ..models import Issue, UserRole, User, Comment, IssueStatus
 from ..utils.decorators import role_required, token_required
 from sqlalchemy import or_, text
-from google import genai
+import google.generativeai as genai
 from sqlalchemy.orm import joinedload
 from datetime import datetime, timedelta, timezone
 import os
@@ -27,8 +27,8 @@ issues_bp = Blueprint('issues_bp', __name__)
 
 # This would be your real Gemini client initialization
 
-gemini_client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-gemini_model = "gemini-2.5-flash"
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+gemini_model = genai.GenerativeModel("gemini-2.5-flash")
 
 def upload_files_to_storage(files):
     """
@@ -70,8 +70,7 @@ def categorize_issue_with_gemini(description: str, image_parts: list) -> IssueCa
         contents = image_parts + [prompt]
         
         # Use GenerationConfig to force the model to return JSON matching your schema
-        response = gemini_client.models.generate_content(
-            model=gemini_model,
+        response = gemini_model.generate_content(
             contents=contents,
             config={
                 "response_mime_type": "application/json",
