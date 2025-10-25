@@ -21,6 +21,8 @@ import vercel_blob
 issues_bp = Blueprint('issues_bp', __name__)
 
 # This would be your real Gemini client initialization
+
+GenerativeModel.configure(api_key=os.getenv("GEMINI_API_KEY"))
 gemini_model = GenerativeModel('gemini-2.5-flash')
 
 def upload_files_to_storage(files):
@@ -36,7 +38,7 @@ def upload_files_to_storage(files):
         filename = secure_filename(file.filename)
         file_bytes = file.read()
         file.seek(0)
-        
+
         response = vercel_blob.put(filename, file_bytes)
 
         uploaded_urls.append(response["url"])  # This is the public file URL
@@ -71,7 +73,7 @@ def find_nearest_worker(location):
 
     # Use raw SQL for PostGIS geospatial query
     sql = text("""
-        SELECT id, name, role, latitude, longitude,
+        SELECT id, first_name as firstName, last_name as lastName, role, latitude, longitude,
                ST_Distance(
                    geography(ST_MakePoint(:lng, :lat)),
                    geography(ST_MakePoint(longitude, latitude))
