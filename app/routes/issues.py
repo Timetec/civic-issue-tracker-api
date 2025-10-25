@@ -11,7 +11,7 @@ import json
 import uuid
 from functools import wraps
 import requests
-from .extensions import db
+from ..extensions import db
 
 # --- Flask Blueprint Definition ---
 

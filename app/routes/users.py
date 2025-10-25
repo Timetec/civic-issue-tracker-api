@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from ..utils.decorators import token_required, role_required
 from ..models import User, UserRole
-from .extensions import db
+from ..extensions import db
 
 users_bp = Blueprint('users_bp', __name__)
 

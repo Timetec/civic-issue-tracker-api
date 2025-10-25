@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 import os
 
 from ..models import User
-from .extensions import db
+from ..extensions import db
 
 auth_bp = Blueprint('auth_bp', __name__)
 
