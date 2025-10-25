@@ -71,7 +71,6 @@ def categorize_issue_with_gemini(description: str, image_parts: list) -> dict:
     
 def find_nearest_worker(location):
     """Find the nearest worker using PostGIS ST_Distance."""
-    lat, lng = location
 
     # Use raw SQL for PostGIS geospatial query
     sql = text("""
@@ -85,6 +84,9 @@ def find_nearest_worker(location):
         ORDER BY distance ASC
         LIMIT 1;
     """)
+
+    lat = float(location["lat"])
+    lng = float(location["lng"])
 
     result = db.session.execute(sql, {"lat": lat, "lng": lng}).fetchone()
     return dict(result) if result else None
