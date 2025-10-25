@@ -3,7 +3,7 @@ from werkzeug.utils import secure_filename
 from ..models import Issue, UserRole, User, Comment, IssueStatus
 from ..utils.decorators import role_required, token_required
 from sqlalchemy import or_, text
-from google.generativeai import GenerativeModel
+import google.generativeai as genai
 from sqlalchemy.orm import joinedload
 from datetime import datetime, timedelta, timezone
 import os
@@ -22,8 +22,8 @@ issues_bp = Blueprint('issues_bp', __name__)
 
 # This would be your real Gemini client initialization
 
-GenerativeModel.configure(api_key=os.getenv("GEMINI_API_KEY"))
-gemini_model = GenerativeModel('gemini-2.5-flash')
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+gemini_model = genai.GenerativeModel('gemini-2.5-flash')
 
 def upload_files_to_storage(files):
     """
