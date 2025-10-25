@@ -26,6 +26,7 @@ class Comment(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     issue_id = db.Column(db.String(8), db.ForeignKey('issues.public_id'), nullable=False)
+    author_name = db.Column(db.String(150), nullable=False)
 
     def to_dict(self):
         return {
@@ -52,6 +53,8 @@ class Issue(db.Model):
     reporter_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     assigned_to_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     rating = db.Column(db.Integer, nullable=True)
+    reporter_name = db.Column(db.String(150), nullable=False)
+    assigned_to_name = db.Column(db.String(150), nullable=True)
     
     # Relationships
     comments = db.relationship('Comment', backref='issue', lazy=True, cascade="all, delete-orphan")

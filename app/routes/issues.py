@@ -92,8 +92,8 @@ def categorize_issue_with_gemini(description: str, image_parts: list) -> dict:
         try:
             text = response.text.strip()
             result = json.loads(text)
-        except Exception:
-            print("Gemini output was not JSON, falling back.")
+        except Exception as e:
+            print(f"Gemini output was not JSON, falling back. {e}")
             result = {"category": "Other", "title": "Issue Report"}
         
         # Add a final validation step
@@ -181,14 +181,15 @@ def create_issue(current_user):
             "title": ai_result.get("title", "Issue Report"),
             "description": description,
             "category": ai_result.get("category", "Other"),
-            "photoUrls": photo_urls,
-            "location": location,
+            "photo_urls": photo_urls,
+            "location_lat": location.lat,
+            "location_lng": location.lng,
             "status": "Pending",
-            "createdAt": datetime.now(timezone.utc),
-            "reporterId": reporter.email,
-            "reporterName": f"{reporter.first_name} {reporter.last_name}",
-            "assignedTo": assigned_worker['email'] if assigned_worker else None,
-            "assignedToName": f"{assigned_worker['firstName']} {assigned_worker['lastName']}" if assigned_worker else None,
+            "created_at": datetime.now(timezone.utc),
+            "reporter_id": reporter.email,
+            "reporter_name": f"{reporter.first_name} {reporter.last_name}",
+            "assigned_to_id": assigned_worker['email'] if assigned_worker else None,
+            "assigned_to_name": f"{assigned_worker['firstName']} {assigned_worker['lastName']}" if assigned_worker else None,
             "comments": []
         }
         
@@ -224,8 +225,8 @@ def add_comment_to_issue(issue_id, current_user):
         
         # 2. Check if user is authorized to comment (example logic)
         author = current_user
-        is_reporter = issue.reporterId == author.email
-        is_assigned = issue.assignedTo == author.email
+        is_reporter = issue.reporter_id == author.email
+        is_assigned = issue.assigned_to == author.email
         is_admin = author.role == 'Admin'
         if not (is_reporter or is_assigned or is_admin):
             return jsonify({"message": "You are not authorized to comment on this issue."}), 403
@@ -233,10 +234,10 @@ def add_comment_to_issue(issue_id, current_user):
         # 3. Create and add the new comment
         new_comment_data = {
             "id": str(uuid.uuid4()),
-            "authorId": author.email,
-            "authorName": f"{author.first_name} {author.last_name}",
+            "author_id": author.email,
+            "author_name": f"{author.first_name} {author.last_name}",
             "text": comment_text,
-            "createdAt": datetime.now(timezone.utc),
+            "created_at": datetime.now(timezone.utc),
         }
         
         # Using SQLAlchemy:
@@ -271,12 +272,12 @@ def update_issue_status(issue_id, current_user):
         # 2. Authorization Check
         # In a real app `g.user` would be the SQLAlchemy object.
         is_admin = current_user.role == 'Admin'
-        is_assigned_worker = current_user.email == issue['assignedTo']
+        is_assigned_worker = current_user.id == issue.assigned_to_id
         
         if not (is_admin or is_assigned_worker):
             # Simulate a worker trying to access an unassigned issue
             if current_user.role == 'Worker' and not is_assigned_worker:
-                 print(f"Auth failed: Worker {current_user.email} is not assigned to issue for {issue['assignedTo']}")
+                 print(f"Auth failed: Worker {current_user.email} is not assigned to issue for {issue.assigned_to_name}")
             return jsonify({"message": "You are not authorized to update this issue's status."}), 403
 
         # 3. Update the status and commit
@@ -314,8 +315,8 @@ def assign_issue_to_worker(issue_id):
             return jsonify({"message": "Worker not found or user is not a worker."}), 404
         
         # 3. Update the issue and commit
-        issue.assignedTo = worker.email
-        issue.assignedToName = f"{worker.firstName} {worker.lastName}"
+        issue.assigned_to = worker.email
+        issue.assigned_to_name = f"{worker.first_name} {worker.last_name}"
         db.session.commit()
         return jsonify(issue.to_dict()), 200
         
