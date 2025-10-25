@@ -238,7 +238,8 @@ def add_comment_to_issue(current_user, issue_id):
         return jsonify({"message": "An internal error occurred."}), 500
     
 @issues_bp.route('/<string:issue_id>/status/', methods=['PUT'])
-@role_required(UserRole.Admin) 
+@token_required
+@role_required(UserRole.Admin, UserRole.Worker)
 def update_issue_status(current_user, issue_id):
     """
     Updates the status of an issue.
@@ -252,7 +253,7 @@ def update_issue_status(current_user, issue_id):
             return jsonify({"message": "Status is required."}), 400
         
         # 1. Fetch the issue from the database
-        issue = Issue.query.get(issue_id)
+        issue = Issue.query.filter_by(public_id=issue_id).first()
         if not issue:
             return jsonify({"message": "Issue not found."}), 404
         
