@@ -220,11 +220,11 @@ def add_comment_to_issue(current_user, issue_id):
 
         # 3. Create and add the new comment
         new_comment_data = {
-            "id": str(uuid.uuid4()),
-            "author_id": author.email,
+            "author_id": author.id,
             "author_name": f"{author.first_name} {author.last_name}",
             "text": comment_text,
             "created_at": datetime.now(timezone.utc),
+            "issue_id": issue_id
         }
         
         # Using SQLAlchemy:
