@@ -73,11 +73,8 @@ def categorize_issue_with_gemini(description: str, image_parts: list) -> IssueCa
         response = gemini_model.generate_content(
             contents=contents,
             generation_config=genai.GenerationConfig(
-                temperature=0.4,
-                max_output_tokens=512,
-                routing_config= {
-                    "manualMode" : {"modelName" : "IssueCategory"}
-                }
+                response_mime_type="application/json",
+                response_schema=IssueCategory
             )
         )
         
