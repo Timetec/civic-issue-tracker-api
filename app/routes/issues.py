@@ -71,10 +71,10 @@ def categorize_issue_with_gemini(description: str, image_parts: list) -> dict:
         }
 
         prompt = f"""
-            Analyze the user's report about a civic issue. Based on the description and any images,
-            categorize it and create a concise title.
-
-            User Description: "{description}"
+            Analyze this issue report and respond **only** in JSON with fields:
+            "category": "<one of: Pothole, Garbage, Streetlight, Graffiti, Flooding, Damaged Signage, Other>",
+            "title": "<short title>"
+            For this User Description: "{description}"
         """
         
         contents = image_parts + [prompt]
@@ -82,13 +82,19 @@ def categorize_issue_with_gemini(description: str, image_parts: list) -> dict:
         # Use GenerationConfig to force the model to return JSON matching your schema
         response = gemini_model.generate_content(
             contents,
-            generation_config={
-                "response_mime_type": "application/json",
-                "response_schema": issue_schema
-            }
+            generation_config=GenerationConfig(
+                temperature=0.4,
+                candidate_count=1,
+                max_output_tokens=512
+            )
         )
         
-        result = json.loads(response.text)
+        try:
+            text = response.text.strip()
+            result = json.loads(text)
+        except Exception:
+            print("Gemini output was not JSON, falling back.")
+            result = {"category": "Other", "title": "Issue Report"}
         
         # Add a final validation step
         if result.get("category") not in issue_schema["properties"]["category"]["enum"]:
@@ -179,8 +185,8 @@ def create_issue(current_user):
             "location": location,
             "status": "Pending",
             "createdAt": datetime.now(timezone.utc),
-            "reporterId": reporter['email'],
-            "reporterName": f"{reporter['firstName']} {reporter['lastName']}",
+            "reporterId": reporter.email,
+            "reporterName": f"{reporter.first_name} {reporter.last_name}",
             "assignedTo": assigned_worker['email'] if assigned_worker else None,
             "assignedToName": f"{assigned_worker['firstName']} {assigned_worker['lastName']}" if assigned_worker else None,
             "comments": []
@@ -227,8 +233,8 @@ def add_comment_to_issue(issue_id, current_user):
         # 3. Create and add the new comment
         new_comment_data = {
             "id": str(uuid.uuid4()),
-            "authorId": author['email'],
-            "authorName": f"{author['firstName']} {author['lastName']}",
+            "authorId": author.email,
+            "authorName": f"{author.first_name} {author.last_name}",
             "text": comment_text,
             "createdAt": datetime.now(timezone.utc),
         }
