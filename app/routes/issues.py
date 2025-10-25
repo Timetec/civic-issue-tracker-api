@@ -39,7 +39,9 @@ def upload_files_to_storage(files):
         file_bytes = file.read()
         file.seek(0)
 
-        response = vercel_blob.put(filename, file_bytes)
+        response = vercel_blob.put(filename, file_bytes, {
+                "addRandomSuffix": "true",
+            })
 
         uploaded_urls.append(response["url"])  # This is the public file URL
 
