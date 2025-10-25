@@ -244,6 +244,7 @@ def add_comment_to_issue(current_user, issue_id):
 
     except Exception as e:
         print(f"Error adding comment: {e}")
+        traceback.print_exc()
         return jsonify({"message": "An internal error occurred."}), 500
     
 @issues_bp.route('/<string:issue_id>/status/', methods=['PUT'])
@@ -261,6 +262,7 @@ def update_issue_status(current_user, issue_id):
         if not new_status:
             return jsonify({"message": "Status is required."}), 400
         
+
         # 1. Fetch the issue from the database
         issue = Issue.query.filter_by(public_id=issue_id).first()
         if not issue:
@@ -291,6 +293,7 @@ def update_issue_status(current_user, issue_id):
         
     except Exception as e:
         print(f"Error updating issue status: {e}")
+        traceback.print_exc()
         return jsonify({"message": "An internal error occurred."}), 500
 
 
