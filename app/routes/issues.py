@@ -204,7 +204,9 @@ def add_comment_to_issue(current_user, issue_id):
             return jsonify({"message": "Comment text is required."}), 400
 
         # 1. Find the issue in the database
-        issue = Issue.query.options(joinedload(Issue.comments)).get(issue_id)
+        issue = Issue.query.options(joinedload(Issue.comments)) \
+                   .filter_by(public_id=issue_id) \
+                   .first()
         if not issue:
             return jsonify({"message": "Issue not found."}), 404
         
