@@ -259,7 +259,7 @@ def update_issue_status(current_user, issue_id):
         
         # 2. Authorization Check
         # In a real app `g.user` would be the SQLAlchemy object.
-        is_admin = current_user.role == 'Admin'
+        is_admin = current_user.role == UserRole.Admin
         is_assigned_worker = current_user.id == issue.assigned_to_id
         
         if not (is_admin or is_assigned_worker):
