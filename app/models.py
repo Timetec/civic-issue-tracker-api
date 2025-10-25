@@ -1,8 +1,8 @@
+import bcrypt
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
 from datetime import datetime
-from flask_bcrypt import bcrypt
 import enum
 import datetime
 db = SQLAlchemy()

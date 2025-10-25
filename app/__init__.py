@@ -4,6 +4,7 @@ from flask_migrate import Migrate, upgrade
 from flask_cors import CORS
 from dotenv import load_dotenv
 import os
+from flask_bcrypt import Bcrypt
 
 from .models import db
 
@@ -21,6 +22,8 @@ def create_app():
     db.init_app(app)
     Migrate(app, db)
 
+    bcrypt = Bcrypt(app)
+    
     with app.app_context():
         try:
             print("🔄 Running database migrations...")
