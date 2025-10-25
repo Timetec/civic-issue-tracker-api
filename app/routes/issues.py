@@ -281,6 +281,7 @@ def update_issue_status(current_user, issue_id):
         
         status_map = {
             "Pending": IssueStatus.Pending,
+            "In Progress": IssueStatus.InProgress,
             "For Review": IssueStatus.ForReview,
             "Resolved": IssueStatus.Resolved
         }
