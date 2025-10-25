@@ -323,7 +323,7 @@ def assign_issue_to_worker(current_user, issue_id):
             return jsonify({"message": "Worker not found or user is not a worker."}), 404
         
         # 3. Update the issue and commit
-        issue.assigned_to = worker.email
+        issue.assigned_to_id = worker.id
         issue.assigned_to_name = f"{worker.first_name} {worker.last_name}"
         db.session.commit()
         return jsonify(issue.to_dict()), 200
