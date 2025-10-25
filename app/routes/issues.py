@@ -174,8 +174,7 @@ def create_issue(current_user):
             "reporter_id": reporter.id,
             "reporter_name": f"{reporter.first_name} {reporter.last_name}",
             "assigned_to_id": assigned_worker['id'] if assigned_worker else None,
-            "assigned_to_name": f"{assigned_worker['firstName']} {assigned_worker['lastName']}" if assigned_worker else None,
-            "comments": []
+            "assigned_to_name": f"{assigned_worker['firstName']} {assigned_worker['lastName']}" if assigned_worker else None
         }
         
         # Using SQLAlchemy:
