@@ -116,7 +116,7 @@ def find_nearest_worker(location):
     lng = float(location["lng"])
 
     result = db.session.execute(sql, {"lat": lat, "lng": lng}).fetchone()
-    return dict(result) if result else None
+    return dict(result._mapping) if result else None
 
 # --- Flask Blueprint Definition ---
 
