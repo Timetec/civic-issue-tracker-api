@@ -3,7 +3,7 @@ from werkzeug.utils import secure_filename
 from ..models import Issue, UserRole, User, Comment, IssueStatus
 from ..utils.decorators import role_required, token_required
 from sqlalchemy import or_, text
-from google.generativeai import GenerativeModel, Part
+from google.generativeai import GenerativeModel
 from sqlalchemy.orm import joinedload
 from datetime import datetime, timedelta, timezone
 import os
@@ -118,12 +118,12 @@ def create_issue(current_user):
         
         # Convert photos to Gemini-compatible 'Part' objects if they exist
         image_parts = []
-        for photo in photos:
-            image_parts.append(Part.from_data(
-                mime_type=photo.content_type,
-                data=photo.read()
-            ))
-            photo.seek(0) # Reset file pointer after reading
+        # for photo in photos:
+        #    image_parts.append(Part.from_data(
+        #        mime_type=photo.content_type,
+        #        data=photo.read()
+        #    ))
+        #    photo.seek(0) # Reset file pointer after reading
 
         # 3. Call Gemini for AI-powered categorization and title
         ai_result = categorize_issue_with_gemini(description, image_parts)
