@@ -72,10 +72,13 @@ def categorize_issue_with_gemini(description: str, image_parts: list) -> IssueCa
         # Use GenerationConfig to force the model to return JSON matching your schema
         response = gemini_model.generate_content(
             contents=contents,
-            config={
-                "response_mime_type": "application/json",
-                "response_schema": IssueCategory
-            },
+            generation_config=genai.GenerationConfig(
+                temperature=0.4,
+                max_output_tokens=512,
+                routing_config= {
+                    "manualMode" : {"modelName" : "IssueCategory"}
+                }
+            )
         )
         
         try:
@@ -83,7 +86,7 @@ def categorize_issue_with_gemini(description: str, image_parts: list) -> IssueCa
 
         except Exception as e:
             print(f"Gemini output was not JSON, falling back. {e}")
-            result = {"category": "Other", "title": "Issue Report"}
+            result = IssueCategory(category="Other", title="Issue Report")
         
         return result
         
