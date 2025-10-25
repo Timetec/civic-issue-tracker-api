@@ -28,11 +28,13 @@ def register():
     db.session.add(new_user)
     db.session.commit()
     
+    payload = {
+            'exp': datetime.now() + timedelta(days=1),
+            'iat': datetime.now(),
+            'sub': new_user.id
+        }
     # Create a token
-    token = jwt.encode({
-        'user_id': str(new_user.id),
-        'exp': datetime.utcnow() + timedelta(days=7)
-    }, os.environ.get('SECRET_KEY'), algorithm="HS256")
+    token = jwt.encode(payload, os.environ.get('SECRET_KEY'), algorithm="HS256")
     
     user_data = new_user.to_dict()
 
@@ -63,9 +65,9 @@ def login():
     try:
         # Create the JWT token
         payload = {
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1), # Token expires in 1 day
-            'iat': datetime.datetime.utcnow(),
-            'sub': user.id # Subject of the token is the user ID
+            'exp': datetime.now() + timedelta(days=1),
+            'iat': datetime.now(),
+            'sub': user.id
         }
         token = jwt.encode(
             payload,
