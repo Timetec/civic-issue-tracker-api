@@ -4,6 +4,7 @@ from ..models import Issue, UserRole, User, Comment, IssueStatus
 from ..utils.decorators import role_required, token_required
 from sqlalchemy import or_, text
 import google.generativeai as genai
+from google.generativeai.types import GenerationConfig
 from sqlalchemy.orm import joinedload
 from datetime import datetime, timedelta, timezone
 import os
@@ -48,25 +49,59 @@ def upload_files_to_storage(files):
     return uploaded_urls
 
 def categorize_issue_with_gemini(description: str, image_parts: list) -> dict:
-    """Placeholder for calling the Gemini API to get a title and category."""
-    print("Simulating Gemini API call...")
+    """
+    Calls the Gemini API to get a title and category, enforcing JSON output.
+    """
+    print("Calling Gemini API for categorization...")
     try:
+        # Define the exact JSON structure you want the model to return
+        issue_schema = {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "string",
+                    "enum": ["Pothole", "Garbage", "Streetlight", "Graffiti", "Flooding", "Damaged Signage", "Other"]
+                },
+                "title": {
+                    "type": "string",
+                    "description": "A concise, descriptive title for the report."
+                }
+            },
+            "required": ["category", "title"]
+        }
+
         prompt = f"""
             Analyze the user's report about a civic issue. Based on the description and any images,
-            categorize it into one of: Pothole, Garbage, Streetlight, Graffiti, Flooding, Damaged Signage, Other.
-            Also, create a concise, descriptive title for the report.
+            categorize it and create a concise title.
 
             User Description: "{description}"
-            
-            Return ONLY a valid JSON object with 'category' and 'title' keys.
-            """
+        """
+        
         contents = image_parts + [prompt]
-        response = gemini_model.generate_content(contents)
+        
+        # Use GenerationConfig to force the model to return JSON matching your schema
+        response = gemini_model.generate_content(
+            contents,
+            generation_config=GenerationConfig(
+                response_mime_type="application/json",
+                response_schema=issue_schema
+            )
+        )
+        
         result = json.loads(response.text)
-        # Add validation for category and title here
+        
+        # Add a final validation step
+        if result.get("category") not in issue_schema["properties"]["category"]["enum"]:
+            print(f"Warning: Gemini returned an invalid category '{result.get('category')}'. Defaulting to 'Other'.")
+            result["category"] = "Other"
+            
         return result
+        
     except Exception as e:
         print(f"Gemini call failed: {e}")
+        # Add more detailed logging for debugging if an error still occurs
+        if 'response' in locals() and hasattr(response, 'prompt_feedback'):
+            print(f"Gemini prompt feedback: {response.prompt_feedback}")
         return {"category": "Other", "title": "Issue Report"}
     
 def find_nearest_worker(location):
