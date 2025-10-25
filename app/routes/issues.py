@@ -464,8 +464,8 @@ def get_recent_public_issues():
         seven_days_ago = datetime.now(timezone.utc) - timedelta(days=7)
         
         recent_issues = Issue.query.filter(
-            Issue.createdAt >= seven_days_ago
-        ).order_by(Issue.createdAt.desc()).all()
+            Issue.created_at >= seven_days_ago
+        ).order_by(Issue.created_at.desc()).all()
         
         issues_list = [issue.to_dict() for issue in recent_issues]
         
