@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
+from flask_migrate import Migrate, upgrade
 from flask_cors import CORS
 from dotenv import load_dotenv
 import os
@@ -20,6 +20,14 @@ def create_app():
 
     db.init_app(app)
     Migrate(app, db)
+    
+    with app.app_context():
+        try:
+            print("🔄 Running database migrations...")
+            upgrade()
+            print("✅ Database is up to date.")
+        except Exception as e:
+            print(f"⚠️ Skipping migration due to error: {e}")
 
     from . import routes
     app.register_blueprint(routes.bp)
