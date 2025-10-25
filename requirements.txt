@@ -14,4 +14,4 @@ SQLAlchemy==2.0.34
 alembic==1.17.0
 protobuf==4.25.3
 vercel_blob==0.4.2
-pydantic=2.12.3
+pydantic==2.12.3
