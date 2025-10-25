@@ -213,7 +213,7 @@ def add_comment_to_issue(current_user, issue_id):
         # 2. Check if user is authorized to comment (example logic)
         author = current_user
         is_reporter = issue.reporter_id == author.id
-        is_assigned = issue.assigned_to == author.id
+        is_assigned = issue.assigned_to_id == author.id
         is_admin = author.role == 'Admin'
         if not (is_reporter or is_assigned or is_admin):
             return jsonify({"message": "You are not authorized to comment on this issue."}), 403
