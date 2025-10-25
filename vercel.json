@@ -13,11 +13,5 @@
       "dest": "api/index.py"
     }
   ],
-  "outputDirectory": "static",
-  "build": {
-    "env": {
-      "FLASK_APP": "api.index:app"
-    },
-    "command": "flask db upgrade"
-  }
+  "outputDirectory": "static"
 }
