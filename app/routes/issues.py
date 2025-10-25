@@ -267,10 +267,16 @@ def update_issue_status(current_user, issue_id):
             if current_user.role == 'Worker' and not is_assigned_worker:
                  print(f"Auth failed: Worker {current_user.email} is not assigned to issue for {issue.assigned_to_name}")
             return jsonify({"message": "You are not authorized to update this issue's status."}), 403
-
+        
+        status_map = {
+            "Pending": IssueStatus.Pending,
+            "For Review": IssueStatus.ForReview,
+            "Resolved": IssueStatus.Resolved
+        }
+        new_status_to_update = status_map[new_status]
         # 3. Update the status and commit
         print(f"Updating issue {issue_id} status to '{new_status}'")
-        issue.status = new_status
+        issue.status = new_status_to_update
         db.session.commit()
         return jsonify(issue.to_dict()), 200
         
