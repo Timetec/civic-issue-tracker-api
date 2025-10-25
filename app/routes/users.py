@@ -67,7 +67,7 @@ def create_user(current_user):
 
 
 
-@users_bp.route('/me', methods=['GET'])
+@users_bp.route('/me/', methods=['GET'])
 @token_required
 def get_me(current_user: User):
     """
@@ -86,7 +86,7 @@ def get_me(current_user: User):
         # Log the exception e
         return jsonify({"message": "An error occurred while fetching user data"}), 500
     
-@users_bp.route('/me', methods=['PUT'])
+@users_bp.route('/me/', methods=['PUT'])
 @token_required
 def update_me(current_user):
     """
@@ -107,7 +107,7 @@ def update_me(current_user):
         db.session.rollback()
         return jsonify({"message": "Failed to update profile"}), 500
     
-@users_bp.route('/me/password', methods=['PUT'])
+@users_bp.route('/me/password/', methods=['PUT'])
 @token_required
 def update_my_password(current_user):
     """
@@ -129,7 +129,7 @@ def update_my_password(current_user):
         db.session.rollback()
         return jsonify({"message": "Failed to update password"}), 500
 
-@users_bp.route('/me/location', methods=['PUT'])
+@users_bp.route('/me/location/', methods=['PUT'])
 @token_required
 def update_my_location(current_user):
     """

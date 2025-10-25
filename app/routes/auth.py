@@ -8,7 +8,7 @@ from ..extensions import db
 
 auth_bp = Blueprint('auth_bp', __name__)
 
-@auth_bp.route('/register', methods=['POST'])
+@auth_bp.route('/register/', methods=['POST'])
 def register():
     data = request.get_json()
     
@@ -27,7 +27,7 @@ def register():
 
     db.session.add(new_user)
     db.session.commit()
-    
+
     payload = {
             'exp': datetime.now() + timedelta(days=1),
             'iat': datetime.now(),
@@ -40,7 +40,7 @@ def register():
 
     return jsonify({"token": token, "user": user_data}), 201
 
-@auth_bp.route('/login', methods=['POST'])
+@auth_bp.route('/login/', methods=['POST'])
 def login():
     """
     Handles user login.

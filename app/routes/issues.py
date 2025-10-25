@@ -161,7 +161,7 @@ def create_issue(current_user):
         return jsonify({"message": "An internal error occurred."}), 500
 
 
-@issues_bp.route('/<string:issue_id>/comments', methods=['POST'])
+@issues_bp.route('/<string:issue_id>/comments/', methods=['POST'])
 @token_required
 def add_comment_to_issue(issue_id, current_user):
     """
@@ -207,7 +207,7 @@ def add_comment_to_issue(issue_id, current_user):
         print(f"Error adding comment: {e}")
         return jsonify({"message": "An internal error occurred."}), 500
     
-@issues_bp.route('/<string:issue_id>/status', methods=['PUT'])
+@issues_bp.route('/<string:issue_id>/status/', methods=['PUT'])
 @role_required(UserRole.Admin) 
 def update_issue_status(issue_id, current_user):
     """
@@ -248,7 +248,7 @@ def update_issue_status(issue_id, current_user):
         return jsonify({"message": "An internal error occurred."}), 500
 
 
-@issues_bp.route('/<string:issue_id>/assign', methods=['PUT'])
+@issues_bp.route('/<string:issue_id>/assign/', methods=['PUT'])
 @role_required(UserRole.Admin)
 def assign_issue_to_worker(issue_id):
     """
@@ -282,7 +282,7 @@ def assign_issue_to_worker(issue_id):
         return jsonify({"message": "An internal error occurred."}), 500
 
 
-@issues_bp.route('/<string:issue_id>/resolve', methods=['PUT'])
+@issues_bp.route('/<string:issue_id>/resolve/', methods=['PUT'])
 @role_required(UserRole.Citizen)
 def resolve_issue(issue_id, current_user):
     """
@@ -333,7 +333,7 @@ def get_all_issues(current_user):
     except Exception as e:
         return jsonify({"message": "An error occurred while fetching issues"}), 500
     
-@issues_bp.route('/reported', methods=['GET'])
+@issues_bp.route('/reported/', methods=['GET'])
 @token_required
 @role_required(UserRole.Citizen)
 def get_reported_issues(current_user):
@@ -346,7 +346,7 @@ def get_reported_issues(current_user):
     except Exception as e:
         return jsonify({"message": "An error occurred while fetching reported issues"}), 500
 
-@issues_bp.route('/assigned', methods=['GET'])
+@issues_bp.route('/assigned/', methods=['GET'])
 @token_required
 @role_required(UserRole.Worker)
 def get_assigned_issues(current_user):
@@ -359,7 +359,7 @@ def get_assigned_issues(current_user):
     except Exception as e:
         return jsonify({"message": "An error occurred while fetching assigned issues"}), 500
     
-@issues_bp.route('/user/<string:identifier>', methods=['GET'])
+@issues_bp.route('/user/<string:identifier>/', methods=['GET'])
 @token_required
 @role_required(UserRole.Service)
 def get_issues_by_user_identifier(current_user, identifier):
@@ -383,7 +383,7 @@ def get_issues_by_user_identifier(current_user, identifier):
         return jsonify({"message": "An error occurred while searching for user issues"}), 500
 
 
-@issues_bp.route('/<string:id>', methods=['GET'])
+@issues_bp.route('/<string:id>/', methods=['GET'])
 @token_required
 def get_issue_by_id(current_user, id):
     """
@@ -409,7 +409,7 @@ def get_issue_by_id(current_user, id):
         return jsonify({"message": "An error occurred while fetching the issue"}), 500
     
 
-@issues_bp.route('/public/recent', methods=['GET'])
+@issues_bp.route('/public/recent/', methods=['GET'])
 def get_recent_public_issues():
     """
     Fetches all civic issues that were reported within the last 7 days.
