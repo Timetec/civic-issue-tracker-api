@@ -320,6 +320,7 @@ def assign_issue_to_worker(issue_id):
 
 
 @issues_bp.route('/<string:issue_id>/resolve/', methods=['PUT'])
+@token_required
 @role_required(UserRole.Citizen)
 def resolve_issue(current_user, issue_id):
     """
@@ -334,12 +335,12 @@ def resolve_issue(current_user, issue_id):
             return jsonify({"message": "A rating between 1 and 5 is required."}), 400
 
         # 1. Fetch the issue from the database
-        issue = Issue.query.get(issue_id)
+        issue = Issue.query.filter_by(public_id=issue_id).first()
         if not issue:
             return jsonify({"message": "Issue not found."}), 404
         
         # 2. Authorization Check
-        if current_user.role != 'Citizen' or current_user.email != issue['reporterId']:
+        if current_user.role != UserRole.Citizen or current_user.id != issue['reporterId']:
             return jsonify({"message": "You are not authorized to resolve this issue."}), 403
 
         # 3. Business Logic Check: Can only resolve if status is 'For Review'
