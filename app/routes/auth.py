@@ -17,7 +17,7 @@ def register():
         return jsonify({"message": "User with this email already exists."}), 409
 
     new_user = User(
-        email=data['email'],
+        email=data['email'].lower(),
         first_name=data['firstName'],
         last_name=data['lastName'],
         mobile_number=data['mobileNumber'],
