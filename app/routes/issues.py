@@ -169,7 +169,7 @@ def create_issue(current_user):
             "photo_urls": photo_urls,
             "location_lat": float(location["lat"]),
             "location_lng": float(location["lng"]),
-            "status": "Pending",
+            "status": IssueStatus.Pending,
             "created_at": datetime.now(timezone.utc),
             "reporter_id": reporter.id,
             "reporter_name": f"{reporter.first_name} {reporter.last_name}",
