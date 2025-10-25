@@ -299,8 +299,9 @@ def update_issue_status(current_user, issue_id):
 
 
 @issues_bp.route('/<string:issue_id>/assign/', methods=['PUT'])
+@token_required
 @role_required(UserRole.Admin)
-def assign_issue_to_worker(issue_id):
+def assign_issue_to_worker(current_user, issue_id):
     """
     Assigns an issue to a specific worker.
     Accessible by Admins only.
@@ -313,11 +314,11 @@ def assign_issue_to_worker(issue_id):
             return jsonify({"message": "workerEmail is required."}), 400
             
         # 2. Fetch the issue and the worker from the database
-        issue = Issue.query.get(issue_id)
+        issue = Issue.query.filter_by(public_id=issue_id).first()
         if not issue:
             return jsonify({"message": "Issue not found."}), 404
             
-        worker = User.query.filter_by(email=worker_email, role='Worker').first()
+        worker = User.query.filter_by(email=worker_email, role=UserRole.Worker).first()
         if not worker:
             return jsonify({"message": "Worker not found or user is not a worker."}), 404
         
