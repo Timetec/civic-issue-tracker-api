@@ -178,7 +178,7 @@ def create_issue(current_user):
         # 5. Create the issue in the database (example using a dictionary)
         reporter = current_user
         new_issue_data = {
-            "id": str(uuid.uuid4())[:8],
+            "public_id": str(uuid.uuid4())[:8],
             "title": ai_result.get("title", "Issue Report"),
             "description": description,
             "category": ai_result.get("category", "Other"),
