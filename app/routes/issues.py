@@ -1,3 +1,4 @@
+import traceback
 from flask import Blueprint, request, jsonify
 from werkzeug.utils import secure_filename
 from ..models import Issue, UserRole, User, Comment, IssueStatus
@@ -185,6 +186,7 @@ def create_issue(current_user):
 
     except Exception as e:
         print(f"Error creating issue: {e}")
+        traceback.print_exc()
         return jsonify({"message": "An internal error occurred."}), 500
 
 
