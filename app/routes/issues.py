@@ -75,10 +75,10 @@ def find_nearest_worker(location):
 
     # Use raw SQL for PostGIS geospatial query
     sql = text("""
-        SELECT id, first_name as firstName, last_name as lastName, role, latitude, longitude,
+        SELECT id, first_name as firstName, last_name as lastName,
                ST_Distance(
                    geography(ST_MakePoint(:lng, :lat)),
-                   geography(ST_MakePoint(longitude, latitude))
+                   geography(ST_MakePoint(location_lng, location_lat))
                ) AS distance
         FROM users
         WHERE role = 'Worker'
