@@ -34,8 +34,10 @@ def upload_files_to_storage(files):
 
     for file in files:
         filename = secure_filename(file.filename)
-
-        response = vercel_blob.put(filename, file.stream)
+        file_bytes = file.read()
+        file.seek(0)
+        
+        response = vercel_blob.put(filename, file_bytes)
 
         uploaded_urls.append(response["url"])  # This is the public file URL
 
