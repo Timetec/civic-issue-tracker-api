@@ -82,10 +82,10 @@ def categorize_issue_with_gemini(description: str, image_parts: list) -> dict:
         # Use GenerationConfig to force the model to return JSON matching your schema
         response = gemini_model.generate_content(
             contents,
-            generation_config=GenerationConfig(
-                response_mime_type="application/json",
-                response_schema=issue_schema
-            )
+            generation_config={
+                "response_mime_type": "application/json",
+                "response_schema": issue_schema
+            }
         )
         
         result = json.loads(response.text)
@@ -264,13 +264,13 @@ def update_issue_status(issue_id, current_user):
         
         # 2. Authorization Check
         # In a real app `g.user` would be the SQLAlchemy object.
-        is_admin = current_user['role'] == 'Admin'
-        is_assigned_worker = current_user['email'] == issue['assignedTo']
+        is_admin = current_user.role == 'Admin'
+        is_assigned_worker = current_user.email == issue['assignedTo']
         
         if not (is_admin or is_assigned_worker):
             # Simulate a worker trying to access an unassigned issue
-            if current_user['role'] == 'Worker' and not is_assigned_worker:
-                 print(f"Auth failed: Worker {current_user['email']} is not assigned to issue for {issue['assignedTo']}")
+            if current_user.role == 'Worker' and not is_assigned_worker:
+                 print(f"Auth failed: Worker {current_user.email} is not assigned to issue for {issue['assignedTo']}")
             return jsonify({"message": "You are not authorized to update this issue's status."}), 403
 
         # 3. Update the status and commit
@@ -338,7 +338,7 @@ def resolve_issue(issue_id, current_user):
             return jsonify({"message": "Issue not found."}), 404
         
         # 2. Authorization Check
-        if current_user['role'] != 'Citizen' or current_user['email'] != issue['reporterId']:
+        if current_user.role != 'Citizen' or current_user.email != issue['reporterId']:
             return jsonify({"message": "You are not authorized to resolve this issue."}), 403
 
         # 3. Business Logic Check: Can only resolve if status is 'For Review'
