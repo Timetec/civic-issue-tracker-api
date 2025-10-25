@@ -101,7 +101,7 @@ def find_nearest_worker(location):
 
     # Use raw SQL for PostGIS geospatial query
     sql = text("""
-        SELECT id, first_name as firstName, last_name as lastName,
+        SELECT id, first_name, last_name,
                ST_Distance(
                    geography(ST_MakePoint(:lng, :lat)),
                    geography(ST_MakePoint(location_lng, location_lat))
@@ -116,7 +116,15 @@ def find_nearest_worker(location):
     lng = float(location["lng"])
 
     result = db.session.execute(sql, {"lat": lat, "lng": lng}).fetchone()
-    return dict(result._mapping) if result else None
+    if result:
+        # Normalize keys to match your usage
+        return {
+            "id": result.id,
+            "firstName": result.first_name,   # map column to key you use
+            "lastName": result.last_name,
+            "distance": result.distance
+        }
+    return None
 
 # --- Flask Blueprint Definition ---
 
