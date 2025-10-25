@@ -15,6 +15,7 @@ from ..extensions import db
 import vercel_blob
 from pydantic import BaseModel
 from typing import Literal, List
+import re
 
 # --- Flask Blueprint Definition ---
 
@@ -73,13 +74,13 @@ def categorize_issue_with_gemini(description: str, image_parts: list) -> IssueCa
         response = gemini_model.generate_content(
             contents=contents,
             generation_config=genai.GenerationConfig(
-                response_mime_type="application/json",
                 response_schema=IssueCategory
             )
         )
         
         try:
-            result: IssueCategory = response.parsed
+            clean_json = re.sub(r"^```json\s*|```$", "", response.text.strip(), flags=re.MULTILINE)
+            result: IssueCategory = IssueCategory.model_validate_json(clean_json)
 
         except Exception as e:
             print(f"Gemini output was not JSON, falling back. {e}")
