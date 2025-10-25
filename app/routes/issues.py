@@ -12,6 +12,7 @@ import uuid
 from functools import wraps
 import requests
 from ..extensions import db
+import vercel_blob
 
 # --- Flask Blueprint Definition ---
 
@@ -30,21 +31,13 @@ def upload_files_to_storage(files):
         return ["/assets/placeholder-image.svg"]
 
     uploaded_urls = []
-    vercel_blob_api = "https://api.vercel.com/v2/blob"
-    headers = {
-        "Authorization": f"Bearer {os.getenv('BLOB_READ_WRITE_TOKEN')}"
-    }
 
     for file in files:
         filename = secure_filename(file.filename)
-        files_data = {"file": (filename, file.stream, file.mimetype)}
 
-        # Upload to Vercel Blob Storage
-        response = requests.post(vercel_blob_api, files=files_data, headers=headers)
-        response.raise_for_status()
+        response = vercel_blob.put(filename, file.stream)
 
-        blob_info = response.json()
-        uploaded_urls.append(blob_info["url"])  # This is the public file URL
+        uploaded_urls.append(response["url"])  # This is the public file URL
 
     return uploaded_urls
 
