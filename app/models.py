@@ -1,11 +1,10 @@
-from app import bcrypt
+from .extensions import db, bcrypt
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
 from datetime import datetime
 import enum
 import datetime
-db = SQLAlchemy()
 
 # Define Enums for roles and statuses to match the frontend
 class UserRole(enum.Enum):

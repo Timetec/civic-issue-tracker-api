@@ -3,7 +3,8 @@ import jwt
 from datetime import datetime, timedelta
 import os
 
-from ..models import db, User
+from ..models import User
+from .extensions import db
 
 auth_bp = Blueprint('auth_bp', __name__)
 

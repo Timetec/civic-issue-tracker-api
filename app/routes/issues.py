@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from werkzeug.utils import secure_filename
-from ..models import Issue, UserRole, User, Comment, IssueStatus, db
+from ..models import Issue, UserRole, User, Comment, IssueStatus
 from ..utils.decorators import role_required, token_required
 from sqlalchemy import or_, text
 from google.generativeai import GenerativeModel, Part
@@ -11,7 +11,7 @@ import json
 import uuid
 from functools import wraps
 import requests
-
+from .extensions import db
 
 # --- Flask Blueprint Definition ---
 
