@@ -20,7 +20,7 @@ def create_app():
 
     db.init_app(app)
     Migrate(app, db)
-    
+
     with app.app_context():
         try:
             print("🔄 Running database migrations...")
@@ -29,7 +29,10 @@ def create_app():
         except Exception as e:
             print(f"⚠️ Skipping migration due to error: {e}")
 
-    from . import routes
-    app.register_blueprint(routes.bp)
+    from .routes.auth import auth_bp
+    app.register_blueprint(auth_bp, url_prefix='/api/auth')
+    
+    from .routes.users import users_bp
+    app.register_blueprint(users_bp, url_prefix='/api/users')
 
     return app
