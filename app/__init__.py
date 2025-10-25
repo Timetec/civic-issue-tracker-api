@@ -10,10 +10,12 @@ from .models import db
 
 # Load environment variables
 load_dotenv()
+bcrypt = Bcrypt()
 
 def create_app():
     app = Flask(__name__)
     CORS(app) # Allow requests from your frontend
+    bcrypt.init_app(app)
 
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -22,8 +24,7 @@ def create_app():
     db.init_app(app)
     Migrate(app, db)
 
-    bcrypt = Bcrypt(app)
-    
+
     with app.app_context():
         try:
             print("🔄 Running database migrations...")
