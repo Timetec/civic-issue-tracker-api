@@ -3,8 +3,7 @@ from werkzeug.utils import secure_filename
 from ..models import Issue, UserRole, User, Comment, IssueStatus
 from ..utils.decorators import role_required, token_required
 from sqlalchemy import or_, text
-import google.generativeai as genai
-from google.generativeai.types import GenerationConfig
+from google import genai
 from sqlalchemy.orm import joinedload
 from datetime import datetime, timedelta, timezone
 import os
@@ -14,17 +13,22 @@ from functools import wraps
 import requests
 from ..extensions import db
 import vercel_blob
+from pydantic import BaseModel
+from typing import Literal, List
 
 # --- Flask Blueprint Definition ---
 
+class IssueCategory(BaseModel):
+    category: Literal["Pothole", "Garbage", "Streetlight", "Graffiti", "Flooding", "Damaged Signage", "Other"]
+    title: str
 
 # --- Blueprint Definition ---
 issues_bp = Blueprint('issues_bp', __name__)
 
 # This would be your real Gemini client initialization
 
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-gemini_model = genai.GenerativeModel('gemini-2.5-flash')
+gemini_client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+gemini_model = "gemini-2.5-flash"
 
 def upload_files_to_storage(files):
     """
@@ -48,60 +52,40 @@ def upload_files_to_storage(files):
 
     return uploaded_urls
 
-def categorize_issue_with_gemini(description: str, image_parts: list) -> dict:
+def categorize_issue_with_gemini(description: str, image_parts: list) -> IssueCategory:
     """
     Calls the Gemini API to get a title and category, enforcing JSON output.
     """
     print("Calling Gemini API for categorization...")
     try:
         # Define the exact JSON structure you want the model to return
-        issue_schema = {
-            "type": "object",
-            "properties": {
-                "category": {
-                    "type": "string",
-                    "enum": ["Pothole", "Garbage", "Streetlight", "Graffiti", "Flooding", "Damaged Signage", "Other"]
-                },
-                "title": {
-                    "type": "string",
-                    "description": "A concise, descriptive title for the report."
-                }
-            },
-            "required": ["category", "title"]
-        }
-
         prompt = f"""
-            As a response to this prompt i only need the json no other text should be sent not even confirmation.
-            Analyze this issue report and respond **only** in JSON with fields:
-            "category": "<one of: Pothole, Garbage, Streetlight, Graffiti, Flooding, Damaged Signage, Other>",
-            "title": "<short title>"
-            For this User Description: "{description}"
+        Analyze this civic issue report and respond ONLY in JSON with fields:
+        "category": "<one of: Pothole, Garbage, Streetlight, Graffiti, Flooding, Damaged Signage, Other>",
+        "title": "<short descriptive title>"
+        
+        User Description: "{description}"
         """
         
         contents = image_parts + [prompt]
         
         # Use GenerationConfig to force the model to return JSON matching your schema
-        response = gemini_model.generate_content(
-            contents,
-            generation_config=GenerationConfig(
-                temperature=0.4,
-                candidate_count=1,
-                max_output_tokens=512
-            )
+        response = gemini_client.models.generate_content(
+            model=gemini_model,
+            contents=contents,
+            config={
+                "response_mime_type": "application/json",
+                "response_schema": IssueCategory
+            },
         )
         
         try:
-            text = response.text.strip()
-            result = json.loads(text)
+            result: IssueCategory = response.parsed
+
         except Exception as e:
             print(f"Gemini output was not JSON, falling back. {e}")
             result = {"category": "Other", "title": "Issue Report"}
         
-        # Add a final validation step
-        if result.get("category") not in issue_schema["properties"]["category"]["enum"]:
-            print(f"Warning: Gemini returned an invalid category '{result.get('category')}'. Defaulting to 'Other'.")
-            result["category"] = "Other"
-            
         return result
         
     except Exception as e:
@@ -179,9 +163,9 @@ def create_issue(current_user):
         reporter = current_user
         new_issue_data = {
             "public_id": str(uuid.uuid4())[:8],
-            "title": ai_result.get("title", "Issue Report"),
+            "title": ai_result.title,
             "description": description,
-            "category": ai_result.get("category", "Other"),
+            "category": ai_result.category,
             "photo_urls": photo_urls,
             "location_lat": float(location["lat"]),
             "location_lng": float(location["lng"]),
