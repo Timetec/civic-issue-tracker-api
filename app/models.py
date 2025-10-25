@@ -39,7 +39,7 @@ class Comment(db.Model):
 
 class Issue(db.Model):
     __tablename__ = 'issues'
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(8), primary_key=True)
     # Using a shorter, unique string for the public-facing ID
     public_id = db.Column(db.String(8), unique=True, nullable=False)
     title = db.Column(db.String(150), nullable=False)
