@@ -340,7 +340,7 @@ def resolve_issue(current_user, issue_id):
             return jsonify({"message": "Issue not found."}), 404
         
         # 2. Authorization Check
-        if current_user.role != UserRole.Citizen or current_user.id != issue['reporterId']:
+        if current_user.role != UserRole.Citizen or current_user.id != issue.reporter_id:
             return jsonify({"message": "You are not authorized to resolve this issue."}), 403
 
         # 3. Business Logic Check: Can only resolve if status is 'For Review'
