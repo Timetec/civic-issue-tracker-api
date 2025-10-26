@@ -4,7 +4,7 @@ from flask_migrate import Migrate, upgrade
 from flask_cors import CORS
 from dotenv import load_dotenv
 import os
-from .extensions import db, bcrypt, mail
+from .extensions import db, bcrypt #, mail
 
 
 # Load environment variables
@@ -19,15 +19,15 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
-    app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
-    app.config['MAIL_PORT'] = int(os.environ.get('MAIL_PORT', 587))
-    app.config['MAIL_USE_TLS'] = os.environ.get('MAIL_USE_TLS', 'true').lower() in ['true', 'on', '1']
-    app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
-    app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
-    app.config['MAIL_DEFAULT_SENDER'] =  ('Civic Issue Tracker', os.environ.get('MAIL_USERNAME'))
+    #app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
+    #app.config['MAIL_PORT'] = int(os.environ.get('MAIL_PORT', 587))
+    #app.config['MAIL_USE_TLS'] = os.environ.get('MAIL_USE_TLS', 'true').lower() in ['true', 'on', '1']
+    #app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
+    #app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+    #app.config['MAIL_DEFAULT_SENDER'] =  ('Civic Issue Tracker', os.environ.get('MAIL_USERNAME'))
 
 
-    mail.init_app(app)
+    #mail.init_app(app)
     db.init_app(app)
     Migrate(app, db)
 

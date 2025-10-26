@@ -17,7 +17,7 @@ import vercel_blob
 from pydantic import BaseModel
 from typing import Literal, List
 import re
-from ..mail_services import send_new_issue_notification, send_status_update_notification
+#from ..mail_services import send_new_issue_notification, send_status_update_notification
 
 # --- Flask Blueprint Definition ---
 
@@ -193,7 +193,7 @@ def create_issue(current_user):
         db.session.commit()
 
         # send email notification
-        send_new_issue_notification(user=current_user, issue=new_issue)
+        #send_new_issue_notification(user=current_user, issue=new_issue)
 
         return jsonify(new_issue.to_dict()), 201
 
